@@ -1,7 +1,9 @@
-from fake_useragent import UserAgent
 from pymongo import MongoClient
+from UAbox.pc_UA import Pc_UA
+from Logs import Logger
 import requests
 import time
+import random
 
 
 class TuWwanImages():
@@ -12,14 +14,16 @@ class TuWwanImages():
         self.url = 'https://api.tuwan.com/apps/Welfare/detail?format=json&id='
         self.headers = {
             'Referer': 'https://www.tuwanjun.com/',
-            'User-Agent': UserAgent(use_cache_server=False).random,
+            'User-Agent': random.choice(Pc_UA),
         }
         # mongoDB初始化
         conn = MongoClient('mongodb://localhost:27017/')
         db = conn.testdb
         self.my_set = db.tuwanjun
-
-
+        # 日志初始化
+        self.iszip_logs = Logger('Invalid_download_link.log', 1, 'iszip').getlog()
+        self.isres_logs = Logger('Invalid_response_status.log', 1, 'isres').getlog()
+        self.isnetw_logs = Logger('Invalid_network_status.log', 1, 'isnetw').getlog()
     def get_info(self,id):
         '''
         获取图片标题,图片数量以及图片压缩包
@@ -38,20 +42,18 @@ class TuWwanImages():
                 image_zip_url = info['url']
                 links = 'https://www.tuwanjun.com/?id=%d'%id
                 if image_zip_url[-3:] != 'zip':
-                    with open('Down_url_error.log','a') as f:
-                        f.write("query:%s\nlinks:%s\nDown_url:%s" %(url,links,image_zip_url))
-                    print("下载链接错误:%s"%image_zip_url)
+                    self.iszip_logs.info("当前URL:%s\t下载链接错误:%s\n"%(url,image_zip_url))
                     return None
+                if not title:
+                    title = str(time.time()).split('.')[0]
                 print("id:%s title:%s total:%s\nimages:%s\nlinks:%s" % (id,title,total,image_zip_url,links))
                 return {'ID':id,'Title':title,'Total':total,'down_url':image_zip_url,'links':links}
             else:
-                with open('logs.log','a') as f:
-                    f.write('url:%s\nid:%s\tstatus:%s\n'%(url,id,status))
+                self.isres_logs.info('url:%s\nid:%s\tstatus:%s\n'%(url,id,status))
                 print(info['error_msg'])
                 return None
         else:
-            with open('network_logs','a') as f:
-                f.write("id:%s Stuse is %s" %(id,status))
+            self.isnetw_logs.error("网站错误:id:%s Stuse is %s\n" %(id,status))
 
 
     def save_info(self,data):
@@ -60,7 +62,6 @@ class TuWwanImages():
         :return:
         '''
         self.my_set.save(data)
-        pass
 
 if __name__ == '__main__':
     TW = TuWwanImages()
