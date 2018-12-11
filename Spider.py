@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 from UAbox.pc_UA import Pc_UA
 from Logs import Logger
+from setting import *
 import requests
 import time
 import random
@@ -17,13 +18,11 @@ class TuWwanImages():
             'User-Agent': random.choice(Pc_UA),
         }
         # mongoDB初始化
-        conn = MongoClient('mongodb://localhost:27017/')
-        db = conn.testdb
-        self.my_set = db.tuwanjun
+        self.my_set = my_set
         # 日志初始化
-        self.iszip_logs = Logger('Invalid_download_link.log', 1, 'iszip').getlog()
-        self.isres_logs = Logger('Invalid_response_status.log', 1, 'isres').getlog()
-        self.isnetw_logs = Logger('Invalid_network_status.log', 1, 'isnetw').getlog()
+        self.iszip_logs =iszip_logs
+        self.isres_logs = isres_logs
+        self.isnetw_logs = isnetw_logs
     def get_info(self,id):
         '''
         获取图片标题,图片数量以及图片压缩包
@@ -69,7 +68,3 @@ if __name__ == '__main__':
         temp = TW.get_info(i)
         if temp:
             TW.save_info(temp)
-    pass
-    # temp = TW.get_info(1294)
-    # TW.save_info(temp)
-    # print(1111111)
