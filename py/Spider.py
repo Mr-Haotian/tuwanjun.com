@@ -1,7 +1,5 @@
-from pymongo import MongoClient
 from UAbox.pc_UA import Pc_UA
-from Logs import Logger
-from setting import *
+from py.setting import *
 import requests
 import time
 import random

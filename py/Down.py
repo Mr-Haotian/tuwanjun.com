@@ -1,8 +1,6 @@
 from threading import Thread
-from Logs import Logger
-from setting import *
+from py.setting import *
 import requests
-import pymongo
 import os
 
 class  DownFile():
@@ -27,7 +25,7 @@ class  DownFile():
         Title = data['Title']
         Total = data['Total']
         path = './zip_dir/'
-        filename = '%s_%s_%s.zip'%(ID,Title,Total)
+        filename = '%s-%s-%s.zip'%(ID,Title,Total)
         if os.path.exists(path + filename):
             self.isfile.info('%s已经存在,跳过下载!'% filename)
         else:

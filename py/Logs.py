@@ -1,3 +1,4 @@
+from py.setting import *
 import logging
 
 class Logger():
@@ -13,7 +14,7 @@ class Logger():
         self.logger.setLevel(logging.DEBUG)
 
         # 创建一个handler，用于写入日志文件
-        fh = logging.FileHandler(logname)
+        fh = logging.FileHandler('Logs_dir/' + logname)
         fh.setLevel(logging.DEBUG)
 
         # 再创建一个handler，用于输出到控制台
